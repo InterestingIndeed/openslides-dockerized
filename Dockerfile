@@ -9,7 +9,10 @@ RUN apt-get -y update && \
 
 WORKDIR /app
 
-RUN mkdir OpenSlides && cd OpenSlides
+## setup OpenSlides
+
+RUN mkdir OpenSlides && \
+    cd OpenSlides
 
 ENV VIRTUAL_ENV=.virtualenv
 
@@ -20,6 +23,8 @@ RUN pip install --upgrade setuptools pip
 
 RUN pip install openslides
 
+VOLUME ["/app/personal_data"]
+
 EXPOSE 8000
 
-CMD ["openslides"]
+CMD ["openslides", "start", "--local-installation"]

@@ -46,17 +46,53 @@ If you are not familiar with such kinds of tools, you can copy & paste the sourc
 2. Open [https://raw.githubusercontent.com/frederikheld/openslides-dockerized/master/Dockerfile](https://raw.githubusercontent.com/frederikheld/openslides-dockerized/master/Dockerfile) in your browser
 3. Select "Save page as..." from the menu and save the page into the folder `openslides-dockerized`. Make sure you choose the name `Dockerfile` (without a file type extension!) for the file before you save it!
 
-### Build an run Docker
-The file `Dockerfile` describes a Docker image. This needs to be built first before it can be run as a Docker container. So you have two steps ahead. Make sure that the first one is run inside the directory `openslides-dockerized`. For the second one it doesn't matter where you run it as it will not interact with the file system.
+### Create shared directory
+
+We will use a shared directory to exchange data between the Docker container and your computer. This is important, as all data you add to OpenSlides (user accounts, agenda, etc.) will be stored inside the container. As the container is self-contained, all data will be lost if you stop the container, unless you transfer it to your computer outside of the container. A shared directory is the simplest way to do so.
+
+Inside `openslides-dockerized`, create a new directory `data`. This is the directory we will use below when starting the container. If you understand how this works, you can choose whatever directory you want!
+
+### First start
+
+The file `Dockerfile` describes a Docker image. This needs to be built first before it can be run as a Docker container. So you have two steps ahead. Make sure that the first one is run inside the directory `openslides-dockerized`.
 
 ```sh
 $ docker build --tag openslides:latest .
-$ docker run --name openslides -p 8000:8000 .
+$ docker run --name openslides --port 8000:8000 --volume $(pwd)/data:/app/personal_data openslides:latest
 ```
 
 Depending on your Docker installation, you might need to run those commands with `sudo` privileges.
 
 If you want to run the container in the background (which allows you to close the terminal and keep OpenSlides running), you can add `-d` to the list of parameters of `docker run`.
+
+### Stop & re-start the container
+
+Usually Docker containers are made to run for a long time. But there might be reasons why you want to stop the container and re-start it later. It could also occur that the container stops due to unforseen reasons and you need to re-start it.
+
+Stopping the container is simply done with the following command:
+
+```sh
+$ docker stop openslides
+```
+
+Given that you don't remove the stopped container or the `data` directory, you can re-start the container and it will pick up where you left it with:
+
+```sh
+$ docker start openslides
+```
+
+Re-starting the container is also necessary if you change the OpenSlides configuration in `openslides-dockerized/data/var/settings.py`!
+You can stop the container with
+
+```sh
+$ docker stop openslides
+```
+
+### Advanced configuration
+
+During the first run, OpenSlides will create a file `openslides-docerized/data/var/settings.py`. You can change and add settings there. For a full list of options please see the [OpenSlides settings docs](https://github.com/OpenSlides/OpenSlides/blob/master/SETTINGS.rst). Please note that this page shows the OpenSlides-specific settings only. As OpenSlides is based on the Django framework, you should also have a look into the [Django docs](https://docs.djangoproject.com/en/3.0/).
+
+After you have changed settings, you need to re-start the container in order to make them effective!
 
 ## But why? OpenSlides already comes with a dockerized version?!
 
