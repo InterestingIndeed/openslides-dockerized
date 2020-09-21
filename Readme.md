@@ -58,7 +58,7 @@ The file `Dockerfile` describes a Docker image. This needs to be built first bef
 
 ```sh
 $ docker build --tag openslides:latest .
-$ docker run --name openslides --port 8000:8000 --volume $(pwd)/data:/app/personal_data openslides:latest
+$ docker run --name openslides -p 8000:8000 --volume $(pwd)/data:/app/personal_data openslides:latest
 ```
 
 Depending on your Docker installation, you might need to run those commands with `sudo` privileges.
